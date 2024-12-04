@@ -6,7 +6,7 @@
 </ul>
 
 <p>request fetures by reporting an issue</p>
-<p>next feutures in order:</p>
+<p>next fetures in order:</p>
 <ul>
 <li>mp3 support</li>
 <li>fix video download</li>
