@@ -1,7 +1,13 @@
 <p>this site uses audio files to generate visuals</p>
 <p>the current suported file types are:</p>
-wav
-request fetures by reporting an issue
-next feutures in order:
-mp3 support
-fix video download
+<ul>
+
+  <li>wav</li>
+</ul>
+
+<p>request fetures by reporting an issue</p>
+<p>next feutures in order:</p>
+<ul>
+<li>mp3 support</li>
+<li>fix video download</li>
+</ul>
