@@ -2,12 +2,12 @@
 <p>the current suported file types are:</p>
 <ul>
 
-  <li>wav</li>
+  <li>WAV</li>
+  <li>Mp3</li>
 </ul>
 
 <p>request fetures by reporting an issue</p>
 <p>next fetures in order:</p>
-<ul>
-<li>mp3 support</li>
+<ol>
 <li>fix video download</li>
-</ul>
+</ol>
