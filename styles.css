@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+input[type="file"] {
+    margin: 20px 0;
+}
+
+video {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+}

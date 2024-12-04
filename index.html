@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Reactive Visualization</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+        }
+        canvas {
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload WAV File for Audio Visualization</h1>
+    <input type="file" id="audioFile" accept=".wav">
+    <button id="playButton">Play Audio</button>
+    <progress id="progressBar" value="0" max="100" style="width: 800px; display: none;"></progress>
+    <canvas id="visualization" width="800" height="400"></canvas>
+    <button id="downloadVideo">Download Video</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
