@@ -44,6 +44,11 @@ function playAudio(url) {
     const stream = canvas.captureStream(30); // 30 FPS
     mediaRecorder = new MediaRecorder(stream);
 
+    // Set up MediaRecorder error handling
+    mediaRecorder.onerror = function(event) {
+        console.error('MediaRecorder error:', event.error);
+    };
+
     mediaRecorder.ondataavailable = function(event) {
         if (event.data.size > 0) {
             recordedChunks.push(event.data);
@@ -56,8 +61,9 @@ function playAudio(url) {
         const downloadLink = document.getElementById('downloadVideo');
         downloadLink.href = url;
         downloadLink.download = 'visualization.webm';
-        downloadLink.style.display = 'block';
+        downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
+        recordedChunks = []; // Reset recorded chunks after download
     };
 
     audioElement.onended = function() {
