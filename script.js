@@ -1,4 +1,4 @@
-let audioContext = new (window.AudioContext || window.webkitAudioContext)(); // Create AudioContext once
+let audioContext;
 let analyser;
 let dataArray;
 let canvas;
@@ -7,12 +7,23 @@ let mediaRecorder;
 let recordedChunks = [];
 let audioElement;
 
-// Constants for configuration
-const FFT_SIZE = 2048;
-const FRAME_RATE = 30; // FPS for canvas capture
-const BAR_WIDTH_MULTIPLIER = 2.5; // Multiplier for bar width
+// Create or resume the AudioContext on a user gesture
+document.getElementById('playButton').addEventListener('click', function() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // Now you can play audio
+    if (audioElement) {
+        if (audioElement.paused) {
+            audioElement.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
+            mediaRecorder.start(); // Start recording when play button is clicked
+        }
+    }
+});
 
-// Add event listener for the 'change' event on the file input
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
@@ -22,30 +33,20 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
     }
 });
 
-// Add event listener for the 'click' event on the play button
-document.getElementById('playButton').addEventListener('click', function() {
-    if (audioElement && audioElement.paused) { // Check if audio is paused
-        audioElement.play().catch(error => {
-            console.error('Error playing audio:', error);
-        });
-        mediaRecorder.start(); // Start recording when play button is clicked
-    }
-});
-
 function playAudio(url) {
     audioElement = new Audio(url);
     const source = audioContext.createMediaElementSource(audioElement);
     analyser = audioContext.createAnalyser();
     source.connect(analyser);
     analyser.connect(audioContext.destination);
-    analyser.fftSize = FFT_SIZE; // Set FFT size
+    analyser.fftSize = 2048;
     dataArray = new Uint8Array(analyser.frequencyBinCount);
     
     canvas = document.getElementById('visualization');
     ctx = canvas.getContext('2d');
     
     // Set up MediaRecorder after canvas is defined
-    const stream = canvas.captureStream(FRAME_RATE); // 30 FPS
+    const stream = canvas.captureStream(30); // 30 FPS
     mediaRecorder = new MediaRecorder(stream);
 
     // Set up MediaRecorder error handling
@@ -61,8 +62,9 @@ function playAudio(url) {
 
     mediaRecorder.onstop = function() {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
         const downloadLink = document.getElementById('downloadVideo');
-        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.href = url;
         downloadLink.download = 'visualization.webm';
         downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
@@ -78,20 +80,19 @@ function playAudio(url) {
 
 function visualize() {
     requestAnimationFrame(visualize);
-    analyser.getByteFrequencyData(dataArray); // Get frequency data
+    analyser.getByteFrequencyData(dataArray);
     
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    const barWidth = (canvas.width / dataArray.length) * BAR_WIDTH_MULTIPLIER; // Calculate bar width
+    const barWidth = (canvas.width / dataArray.length) * 2.5;
     let barHeight;
     let x = 0;
 
-    // Update the loop to avoid potential infinite loop
-    for (let i = 0; i < dataArray.length && x < canvas.width; i++) {
+    for (let i = 0; i < dataArray.length; i++) {
         barHeight = dataArray[i];
         ctx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
         ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
-        x += barWidth + 1; // Increment x position for the next bar
+        x += barWidth + 1;
     }
 }
