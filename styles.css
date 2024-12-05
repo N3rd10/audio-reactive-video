@@ -1,18 +1,27 @@
+:root {
+    --background-color: #000;
+    --text-color: #fff;
+    --header-color: #333;
+    --border-color: #fff;
+    --margin: 20px;
+    --canvas-width: 800px;
+}
+
 body {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background-color: #000;
-    color: #fff;
+    background-color: var(--background-color);
+    color: var(--text-color);
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 20px;
+    margin: var(--margin);
 }
 
 h1 {
-    color: #333;
+    color: var(--header-color);
 }
 
 input[type="file"] {
@@ -20,12 +29,14 @@ input[type="file"] {
 }
 
 #progressBar {
-    width: 800px; /* Moved from inline styles */
+    width: var(--canvas-width); /* Moved from inline styles */
     display: none; /* Moved from inline styles */
 }
 
 canvas {
-    border: 1px solid #fff;
+    border: 1px solid var(--border-color);
+    max-width: 100%; /* Ensure canvas is responsive */
+    height: auto; /* Maintain aspect ratio */
 }
 
 video {
