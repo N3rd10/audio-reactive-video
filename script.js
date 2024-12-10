@@ -20,6 +20,7 @@ document.getElementById('playButton').addEventListener('click', function() {
                 console.error('Error playing audio:', error);
             });
             mediaRecorder.start(); // Start recording when play button is clicked
+            updateProgressBar(); // Start updating the progress bar
         }
     }
 });
@@ -30,6 +31,7 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
         const url = URL.createObjectURL(file);
         playAudio(url);
         document.getElementById('playButton').style.display = 'block'; // Show play button
+        document.getElementById('progressBar').style.display = 'block'; // Show progress bar
     }
 });
 
@@ -96,3 +98,18 @@ function visualize() {
         x += barWidth + 1;
     }
 }
+
+// Function to update the progress bar
+function updateProgressBar() {
+    const progressBar = document.getElementById('progressBar');
+    const duration = audioElement.duration;
+
+    if (duration) {
+        const currentTime = audioElement.currentTime;
+        const progress = (currentTime / duration) * 100;
+        progressBar.value = progress;
+
+        // Update the progress bar every second
+        setTimeout(updateProgressBar, 1000);
+    }
+} 
