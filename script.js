@@ -9,6 +9,7 @@ let audioElement;
 
 // Create or resume the AudioContext on a user gesture
 document.getElementById('playButton').addEventListener('click', function() {
+    // Initialize AudioContext if it hasn't been created yet
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
@@ -19,7 +20,10 @@ document.getElementById('playButton').addEventListener('click', function() {
             audioElement.play().catch(error => {
                 console.error('Error playing audio:', error);
             });
-            mediaRecorder.start(); // Start recording when play button is clicked
+            // Ensure mediaRecorder is initialized here
+            if (mediaRecorder) {
+                mediaRecorder.start(); // Start recording when play button is clicked
+            }
             updateProgressBar(); // Start updating the progress bar
         }
     }
@@ -49,7 +53,7 @@ function playAudio(url) {
     
     // Set up MediaRecorder after canvas is defined
     const stream = canvas.captureStream(30); // 30 FPS
-    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder = new MediaRecorder(stream); // Initialize mediaRecorder here
 
     // Set up MediaRecorder error handling
     mediaRecorder.onerror = function(event) {
@@ -112,4 +116,4 @@ function updateProgressBar() {
         // Update the progress bar every second
         setTimeout(updateProgressBar, 1000);
     }
-} 
+}
