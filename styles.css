@@ -28,9 +28,37 @@ input[type="file"] {
     margin: 20px 0;
 }
 
+button {
+    background-color: var(--header-color); /* Use a defined color */
+    color: var(--text-color); /* Text color */
+    border: none; /* Remove default border */
+    padding: 10px 20px; /* Add padding */
+    margin: 10px; /* Add margin for spacing */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    font-size: 16px; /* Increase font size */
+    border-radius: 5px; /* Add rounded corners */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+button:hover {
+    background-color: var(--border-color); /* Change background on hover */
+}
+
 #progressBar {
-    width: var(--canvas-width); /* Moved from inline styles */
-    display: none; /* Moved from inline styles */
+    width: var(--canvas-width); /* Keep the width */
+    display: block; /* Ensure it is displayed */
+    margin: 20px 0; /* Add margin for spacing */
+    height: 20px; /* Set a height for the progress bar */
+    appearance: none; /* Remove default styling */
+    background-color: var(--border-color); /* Background color */
+}
+
+#progressBar::-webkit-progress-value {
+    background-color: var(--header-color); /* Color of the filled part */
+}
+
+#progressBar::-webkit-progress-bar {
+    background-color: var(--border-color); /* Color of the unfilled part */
 }
 
 canvas {
