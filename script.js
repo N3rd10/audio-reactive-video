@@ -7,20 +7,19 @@ let mediaRecorder;
 let recordedChunks = [];
 let audioElement;
 
+// Create or resume the AudioContext on a user gesture
 document.getElementById('playButton').addEventListener('click', function() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
     
+    // Now you can play audio
     if (audioElement) {
         if (audioElement.paused) {
             audioElement.play().catch(error => {
                 console.error('Error playing audio:', error);
             });
-            if (mediaRecorder) {
-                mediaRecorder.start();
-            }
-            updateProgressBar();
+            mediaRecorder.start(); // Start recording when play button is clicked
         }
     }
 });
@@ -28,32 +27,14 @@ document.getElementById('playButton').addEventListener('click', function() {
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
-        console.log('File selected:', file.name);
         const url = URL.createObjectURL(file);
         playAudio(url);
-        document.getElementById('playButton').style.display = 'block';
-        document.getElementById('progressBar').style.display = 'block';
-    } else {
-        console.log('No file selected');
+        document.getElementById('playButton').style.display = 'block'; // Show play button
     }
 });
 
 function playAudio(url) {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
     audioElement = new Audio(url);
-    audioElement.onplay = function() {
-        console.log('Audio is playing');
-    };
-    audioElement.onended = function() {
-        console.log('Audio has ended');
-        if (mediaRecorder) {
-            mediaRecorder.stop();
-        }
-    };
-
     const source = audioContext.createMediaElementSource(audioElement);
     analyser = audioContext.createAnalyser();
     source.connect(analyser);
@@ -64,8 +45,14 @@ function playAudio(url) {
     canvas = document.getElementById('visualization');
     ctx = canvas.getContext('2d');
     
-    const stream = canvas.captureStream(30);
+    // Set up MediaRecorder after canvas is defined
+    const stream = canvas.captureStream(30); // 30 FPS
     mediaRecorder = new MediaRecorder(stream);
+
+    // Set up MediaRecorder error handling
+    mediaRecorder.onerror = function(event) {
+        console.error('MediaRecorder error:', event.error);
+    };
 
     mediaRecorder.ondataavailable = function(event) {
         if (event.data.size > 0) {
@@ -79,44 +66,33 @@ function playAudio(url) {
         const downloadLink = document.getElementById('downloadVideo');
         downloadLink.href = url;
         downloadLink.download = 'visualization.webm';
-        downloadLink.style.display = 'block';
+        downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
-        recordedChunks = [];
+        recordedChunks = []; // Reset recorded chunks after download
+    };
+
+    audioElement.onended = function() {
+        mediaRecorder.stop(); // Stop recording when audio ends
     };
 
     visualize();
- audioElement.play().catch(error => {
-        console.error('Error playing audio:', error);
-    });
 }
 
 function visualize() {
     requestAnimationFrame(visualize);
     analyser.getByteFrequencyData(dataArray);
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)';
+    
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
+    
+    const barWidth = (canvas.width / dataArray.length) * 2.5;
     let barHeight;
     let x = 0;
 
-    for (let i = 0; i < analyser.frequencyBinCount; i++) {
-        barHeight = dataArray[i] / 2;
+    for (let i = 0; i < dataArray.length; i++) {
+        barHeight = dataArray[i];
         ctx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
-        ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight);
+        ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
         x += barWidth + 1;
     }
-}
-
-function updateProgressBar() {
-    const progressBar = document.getElementById('progressBar');
-    const update = () => {
-        if (audioElement) {
-            const percentage = (audioElement.currentTime / audioElement.duration) * 100;
-            progressBar.value = percentage || 0;
-            if (!audioElement.paused) {
-                requestAnimationFrame(update);
-            }
-        }
-    };
-    update();
 }
