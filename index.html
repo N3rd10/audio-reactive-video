@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Reactive Visualization</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <h1>Upload WAV or MP3 File for Audio Visualization</h1>
     <label for="audioFile">Upload WAV or MP3 File:</label>
     <input type="file" id="audioFile" accept=".wav, .mp3">
-    <button id="playButton">Play Audio</button> 
-    <progress id="progressBar" value="0" max="100" style="display: block;"></progress>
+    <button id="playButton" style="display: none;">Play Audio</button> 
+    <progress id="progressBar" value="0" max="100" style="display: none;"></progress>
     <canvas id="visualization" width="800" height="400"></canvas>
-    <button id="downloadVideo">Download Video</button> 
+    <a id="downloadVideo" href="#" download="visualization.webm">Download Video</a>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script> 
 </body>
 </html>
