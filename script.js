@@ -7,6 +7,19 @@ let mediaRecorder;
 let recordedChunks = [];
 let audioElement;
 
+document.getElementById('audioFile').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        console.log('File selected:', file.name);
+        const url = URL.createObjectURL(file);
+        playAudio(url);
+        document.getElementById('playButton').style.display = 'block';
+        document.getElementById('progressBar').style.display = 'block';
+    } else {
+        console.log('No file selected');
+    }
+});
+
 document.getElementById('playButton').addEventListener('click', function() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -22,19 +35,6 @@ document.getElementById('playButton').addEventListener('click', function() {
             }
             updateProgressBar();
         }
-    }
-});
-
-document.getElementById('audioFile').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        console.log('File selected:', file.name);
-        const url = URL.createObjectURL(file);
-        playAudio(url);
-        document.getElementById('playButton').style.display = 'block';
-        document.getElementById('progressBar').style.display = 'block';
-    } else {
-        console.log('No file selected');
     }
 });
 
@@ -85,7 +85,7 @@ function playAudio(url) {
     };
 
     visualize();
- audioElement.play().catch(error => {
+    audioElement.play().catch(error => {
         console.error('Error playing audio:', error);
     });
 }
