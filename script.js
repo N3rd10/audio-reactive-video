@@ -40,6 +40,11 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
 });
 
 function playAudio(url) {
+    // Initialize AudioContext if it hasn't been created yet
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
     audioElement = new Audio(url);
     const source = audioContext.createMediaElementSource(audioElement);
     analyser = audioContext.createAnalyser();
