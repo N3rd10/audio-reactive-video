@@ -7,24 +7,20 @@ let mediaRecorder;
 let recordedChunks = [];
 let audioElement;
 
-// Create or resume the AudioContext on a user gesture
 document.getElementById('playButton').addEventListener('click', function() {
-    // Initialize AudioContext if it hasn't been created yet
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
     
-    // Now you can play audio
     if (audioElement) {
         if (audioElement.paused) {
             audioElement.play().catch(error => {
                 console.error('Error playing audio:', error);
             });
-            // Ensure mediaRecorder is initialized here
             if (mediaRecorder) {
-                mediaRecorder.start(); // Start recording when play button is clicked
+                mediaRecorder.start();
             }
-            updateProgressBar(); // Start updating the progress bar
+            updateProgressBar();
         }
     }
 });
@@ -32,20 +28,32 @@ document.getElementById('playButton').addEventListener('click', function() {
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
+        console.log('File selected:', file.name);
         const url = URL.createObjectURL(file);
         playAudio(url);
-        document.getElementById('playButton').style.display = 'block'; // Show play button
-        document.getElementById('progressBar').style.display = 'block'; // Show progress bar
+        document.getElementById('playButton').style.display = 'block';
+        document.getElementById('progressBar').style.display = 'block';
+    } else {
+        console.log('No file selected');
     }
 });
 
 function playAudio(url) {
-    // Initialize AudioContext if it hasn't been created yet
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     audioElement = new Audio(url);
+    audioElement.onplay = function() {
+        console.log('Audio is playing');
+    };
+    audioElement.onended = function() {
+        console.log('Audio has ended');
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+        }
+    };
+
     const source = audioContext.createMediaElementSource(audioElement);
     analyser = audioContext.createAnalyser();
     source.connect(analyser);
@@ -56,14 +64,8 @@ function playAudio(url) {
     canvas = document.getElementById('visualization');
     ctx = canvas.getContext('2d');
     
-    // Set up MediaRecorder after canvas is defined
-    const stream = canvas.captureStream(30); // 30 FPS
-    mediaRecorder = new MediaRecorder(stream); // Initialize mediaRecorder here
-
-    // Set up MediaRecorder error handling
-    mediaRecorder.onerror = function(event) {
-        console.error('MediaRecorder error:', event.error);
-    };
+    const stream = canvas.captureStream(30);
+    mediaRecorder = new MediaRecorder(stream);
 
     mediaRecorder.ondataavailable = function(event) {
         if (event.data.size > 0) {
@@ -77,48 +79,44 @@ function playAudio(url) {
         const downloadLink = document.getElementById('downloadVideo');
         downloadLink.href = url;
         downloadLink.download = 'visualization.webm';
-        downloadLink.style.display = 'block'; // Show the download link
+        downloadLink.style.display = 'block';
         downloadLink.innerText = 'Download Video';
-        recordedChunks = []; // Reset recorded chunks after download
-    };
-
-    audioElement.onended = function() {
-        mediaRecorder.stop(); // Stop recording when audio ends
+        recordedChunks = [];
     };
 
     visualize();
+ audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+    });
 }
 
 function visualize() {
     requestAnimationFrame(visualize);
     analyser.getByteFrequencyData(dataArray);
-    
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    const barWidth = (canvas.width / dataArray.length) * 2.5;
+    const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
     let barHeight;
     let x = 0;
 
-    for (let i = 0; i < dataArray.length; i++) {
-        barHeight = dataArray[i];
+    for (let i = 0; i < analyser.frequencyBinCount; i++) {
+        barHeight = dataArray[i] / 2;
         ctx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
-        ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+        ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight);
         x += barWidth + 1;
     }
 }
 
-// Function to update the progress bar
 function updateProgressBar() {
     const progressBar = document.getElementById('progressBar');
-    const duration = audioElement.duration;
-
-    if (duration) {
-        const currentTime = audioElement.currentTime;
-        const progress = (currentTime / duration) * 100;
-        progressBar.value = progress;
-
-        // Update the progress bar every second
-        setTimeout(updateProgressBar, 1000);
-    }
+    const update = () => {
+        if (audioElement) {
+            const percentage = (audioElement.currentTime / audioElement.duration) * 100;
+            progressBar.value = percentage || 0;
+            if (!audioElement.paused) {
+                requestAnimationFrame(update);
+            }
+        }
+    };
+    update();
 }
