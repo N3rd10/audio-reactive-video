@@ -7,19 +7,6 @@ let mediaRecorder;
 let recordedChunks = [];
 let audioElement;
 
-document.getElementById('audioFile').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        console.log('File selected:', file.name);
-        const url = URL.createObjectURL(file);
-        playAudio(url);
-        document.getElementById('playButton').style.display = 'block';
-        document.getElementById('progressBar').style.display = 'block';
-    } else {
-        console.log('No file selected');
-    }
-});
-
 document.getElementById('playButton').addEventListener('click', function() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -35,6 +22,19 @@ document.getElementById('playButton').addEventListener('click', function() {
             }
             updateProgressBar();
         }
+    }
+});
+
+document.getElementById('audioFile').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        console.log('File selected:', file.name);
+        const url = URL.createObjectURL(file);
+        playAudio(url);
+        document.getElementById('playButton').style.display = 'block';
+        document.getElementById('progressBar').style.display = 'block';
+    } else {
+        console.log('No file selected');
     }
 });
 
@@ -85,7 +85,7 @@ function playAudio(url) {
     };
 
     visualize();
-    audioElement.play().catch(error => {
+ audioElement.play().catch(error => {
         console.error('Error playing audio:', error);
     });
 }
@@ -93,12 +93,9 @@ function playAudio(url) {
 function visualize() {
     requestAnimationFrame(visualize);
     analyser.getByteFrequencyData(dataArray);
-    
-    // Set the canvas background to black
-    ctx.fillStyle = 'rgba(0, 0, 0, 1)'; // Change to black
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    const bar Width = (canvas.width / analyser.frequencyBinCount) * 2.5;
+    const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
     let barHeight;
     let x = 0;
 
