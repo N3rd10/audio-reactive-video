@@ -93,9 +93,12 @@ function playAudio(url) {
 function visualize() {
     requestAnimationFrame(visualize);
     analyser.getByteFrequencyData(dataArray);
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.2)';
+    
+    // Set the canvas background to black
+    ctx.fillStyle = 'rgba(0, 0, 0, 1)'; // Change to black
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
+    
+    const bar Width = (canvas.width / analyser.frequencyBinCount) * 2.5;
     let barHeight;
     let x = 0;
 
