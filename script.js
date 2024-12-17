@@ -19,7 +19,9 @@ document.getElementById('playButton').addEventListener('click', function() {
             audioElement.play().catch(error => {
                 console.error('Error playing audio:', error);
             });
-            mediaRecorder.start(); // Start recording when play button is clicked
+            if (mediaRecorder && mediaRecorder.state === 'inactive') {
+                mediaRecorder.start(); // Start recording when play button is clicked
+            }
         }
     }
 });
@@ -27,6 +29,12 @@ document.getElementById('playButton').addEventListener('click', function() {
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
+        if (audioElement) {
+            audioElement.pause(); // Pause the previous audio if it exists
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop(); // Stop recording if it's currently recording
+            }
+        }
         const url = URL.createObjectURL(file);
         playAudio(url);
         document.getElementById('playButton').style.display = 'block'; // Show play button
@@ -72,7 +80,9 @@ function playAudio(url) {
     };
 
     audioElement.onended = function() {
-        mediaRecorder.stop(); // Stop recording when audio ends
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop(); // Stop recording when audio ends
+        }
     };
 
     visualize();
