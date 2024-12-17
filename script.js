@@ -93,7 +93,7 @@ function playAudio(url) {
         downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
         recordedChunks = []; // Reset recorded chunks after download
-        console.log('Download link set up:', downloadLink.href);
+        console.log('Download link set up:', downloadLink.href?raw=true);
     };
 
     audioElement.onended = function() {
