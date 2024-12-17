@@ -35,6 +35,12 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
                 mediaRecorder.stop(); // Stop recording if it's currently recording
             }
         }
+        
+        // Initialize AudioContext here if it hasn't been initialized yet
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
         const url = URL.createObjectURL(file);
         playAudio(url);
         document.getElementById('playButton').style.display = 'block'; // Show play button
