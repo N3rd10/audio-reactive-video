@@ -76,10 +76,10 @@ function playAudio(url) {
 
     mediaRecorder.onstop = function() {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
+        const videoURL = URL.createObjectURL(blob);
         const downloadLink = document.getElementById('downloadVideo');
-        downloadLink.href = url;
-        downloadLink.download = 'visualization.webm';
+        downloadLink.href = videoURL; // Set the download link
+        downloadLink.download = 'visualization.webm'; // Set the filename
         downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
         recordedChunks = []; // Reset recorded chunks after download
