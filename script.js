@@ -9,8 +9,10 @@ let audioElement;
 
 // Create or resume the AudioContext on a user gesture
 document.getElementById('playButton').addEventListener('click', function() {
+    console.log('Play button clicked');
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        console.log('AudioContext created');
     }
     
     // Now you can play audio
@@ -21,6 +23,7 @@ document.getElementById('playButton').addEventListener('click', function() {
             });
             if (mediaRecorder && mediaRecorder.state === 'inactive') {
                 mediaRecorder.start(); // Start recording when play button is clicked
+                console.log('MediaRecorder started');
             }
         }
     }
@@ -28,17 +31,20 @@ document.getElementById('playButton').addEventListener('click', function() {
 
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
+    console.log('Audio file selected:', file);
     if (file) {
         if (audioElement) {
             audioElement.pause(); // Pause the previous audio if it exists
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop(); // Stop recording if it's currently recording
+                console.log('MediaRecorder stopped');
             }
         }
         
         // Initialize AudioContext here if it hasn't been initialized yet
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('AudioContext created');
         }
 
         const url = URL.createObjectURL(file);
@@ -48,6 +54,7 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
 });
 
 function playAudio(url) {
+    console.log('Playing audio from URL:', url);
     audioElement = new Audio(url);
     const source = audioContext.createMediaElementSource(audioElement);
     analyser = audioContext.createAnalyser();
@@ -62,6 +69,7 @@ function playAudio(url) {
     // Set up MediaRecorder after canvas is defined
     const stream = canvas.captureStream(30); // 30 FPS
     mediaRecorder = new MediaRecorder(stream);
+    console.log('MediaRecorder initialized');
 
     // Set up MediaRecorder error handling
     mediaRecorder.onerror = function(event) {
@@ -71,10 +79,12 @@ function playAudio(url) {
     mediaRecorder.ondataavailable = function(event) {
         if (event.data.size > 0) {
             recordedChunks.push(event.data);
+            console.log('Data available from MediaRecorder:', event.data.size);
         }
     };
 
     mediaRecorder.onstop = function() {
+        console.log('MediaRecorder stopped');
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const videoURL = URL.createObjectURL(blob);
         const downloadLink = document.getElementById('downloadVideo');
@@ -83,11 +93,14 @@ function playAudio(url) {
         downloadLink.style.display = 'block'; // Show the download link
         downloadLink.innerText = 'Download Video';
         recordedChunks = []; // Reset recorded chunks after download
+        console.log('Download link set up:', downloadLink.href);
     };
 
     audioElement.onended = function() {
+        console.log('Audio playback ended');
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop(); // Stop recording when audio ends
+            console.log('MediaRecorder stopped due to audio end');
         }
     };
 
@@ -111,4 +124,5 @@ function visualize() {
         ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
         x += barWidth + 1;
     }
+    console.log('Visualization updated');
 }
