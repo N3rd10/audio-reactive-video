@@ -86,12 +86,14 @@ function playAudio(url) {
     mediaRecorder.onstop = function() {
         console.log('MediaRecorder stopped');
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        
-        // Use FileSaver.js to save the file
-        saveAs(blob, 'visualization.webm'); // This will prompt the user to download the file
-        
+        const videoURL = URL.createObjectURL(blob);
+        const downloadLink = document.getElementById('downloadVideo');
+        downloadLink.href = videoURL; // Set the download link
+        downloadLink.download = 'visualization.webm'; // Set the filename
+        downloadLink.style.display = 'block'; // Show the download link
+        downloadLink.innerText = 'Download Video';
         recordedChunks = []; // Reset recorded chunks after download
-        console.log('Download initiated');
+        console.log('Download link set up:', downloadLink.href);
     };
 
     audioElement.onended = function() {
