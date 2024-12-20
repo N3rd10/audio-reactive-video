@@ -83,19 +83,22 @@ function playAudio(url) {
         }
     };
 
-    mediaRecorder.onstop = function() {
-        console.log('MediaRecorder stopped');
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const videoURL = URL.createObjectURL(blob);
-        const downloadLink = document.getElementById('downloadVideo');
-        downloadLink.href = videoURL; // Set the download link
-        downloadLink.download = 'visualization.webm'; // Set the filename
-        downloadLink.style.display = 'block'; // Show the download link
-        downloadLink.innerText = 'Download Video';
-        recordedChunks = []; // Reset recorded chunks after download
-        console.log('Download link set up:', downloadLink.href);
-    };
+mediaRecorder.onstop = function() {
+    console.log('MediaRecorder stopped');
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(blob);
+    const downloadLink = document.getElementById('downloadVideo');
+    downloadLink.href = videoURL; // Set the download link
+    downloadLink.download = 'visualization.webm'; // Set the filename
+    downloadLink.style.display = 'block'; // Show the download link
+    downloadLink.innerText = 'Download Video';
+    
+    // Automatically trigger the download
+    downloadLink.click(); // This will start the download automatically
 
+    recordedChunks = []; // Reset recorded chunks after download
+    console.log('Download link set up:', downloadLink.href);
+};
     audioElement.onended = function() {
         console.log('Audio playback ended');
         if (mediaRecorder && mediaRecorder.state === 'recording') {
