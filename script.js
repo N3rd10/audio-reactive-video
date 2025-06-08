@@ -1,3 +1,5 @@
+// Last edited: 2025-06-08 21:18:03 UTC
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service worker.js')
         .then((registration) => {
@@ -7,6 +9,27 @@ if ('serviceWorker' in navigator) {
             console.error('[SW] Service Worker registration failed:', error);
         });
 }
+
+// Initialization logging
+console.log('[INIT] Script loaded at:', new Date().toISOString());
+console.log('[INIT] Last edit:', '2025-06-08 21:18:03 UTC');
+
+// State reporting function
+function logCurrentState(context) {
+    console.log(`[STATE] ${context}`);
+    console.log('  audioContext:', audioContext ? '[OK]' : '[null]',
+        audioContext ? '(state: ' + audioContext.state + ')' : '');
+    console.log('  analyser:', analyser ? '[OK]' : '[null]');
+    console.log('  dataArray:', dataArray ? '[len:'+dataArray.length+']' : '[null]');
+    console.log('  canvas:', canvas ? '[OK]' : '[null]');
+    console.log('  ctx:', ctx ? '[OK]' : '[null]');
+    console.log('  mediaRecorder:', mediaRecorder ? `[${mediaRecorder.state}]` : '[null]');
+    console.log('  recordedChunks:', recordedChunks ? `[len:${recordedChunks.length}]` : '[null]');
+    console.log('  audioElement:', audioElement ? `[src:${audioElement.src}] (currentTime: ${audioElement.currentTime}s paused: ${audioElement.paused})` : '[null]');
+}
+
+// Initial state log
+logCurrentState('After script load');
 
 let audioContext;
 let analyser;
@@ -20,6 +43,8 @@ let audioElement;
 // Play button event handler with detailed logging
 document.getElementById('playButton').addEventListener('click', function() {
     console.log('[UI] Play button pressed by user');
+    logCurrentState('Before handling play button');
+
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         console.log('[Audio] AudioContext created');
@@ -53,12 +78,16 @@ document.getElementById('playButton').addEventListener('click', function() {
     } else {
         console.warn('[UI] Play button pressed, but no audio file loaded.');
     }
+
+    logCurrentState('After handling play button');
 });
 
 // Audio file input event handler with detailed logging
 document.getElementById('audioFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     console.log('[UI] Audio file input changed:', file);
+
+    logCurrentState('Before handling audio file input');
 
     if (file) {
         if (audioElement) {
@@ -84,6 +113,8 @@ document.getElementById('audioFile').addEventListener('change', function(event) 
     } else {
         console.warn('[UI] No audio file selected.');
     }
+
+    logCurrentState('After handling audio file input');
 });
 
 function playAudio(url) {
@@ -142,15 +173,20 @@ function playAudio(url) {
             mediaRecorder.stop();
             console.log('[Recorder] MediaRecorder stopped due to audio end');
         }
+        logCurrentState('After audio end');
     };
 
     audioElement.onplay = function() {
         console.log('[Audio] Audio element play event at', audioElement.currentTime, 'seconds');
+        logCurrentState('Audio element onplay');
     };
 
     audioElement.onpause = function() {
         console.log('[Audio] Audio element pause event at', audioElement.currentTime, 'seconds');
+        logCurrentState('Audio element onpause');
     };
+
+    logCurrentState('After playAudio() setup');
 
     visualize();
 }
